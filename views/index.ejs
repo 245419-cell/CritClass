@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CritClass</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="page-shell">
+      <header class="hero">
+        <div class="hero-copy">
+          <h1>CritClass</h1>
+          <p>Share honest reviews for classes and discover great teachers.</p>
+        </div>
+      </header>
+
+      <main class="auth-panel">
+        <div class="auth-card">
+          <div class="brand-bar">
+            <span>CritClass</span>
+          </div>
+
+          <% if (message) { %>
+          <div class="alert"><%= message %></div>
+          <% } %>
+
+          <a href="/auth/google" class="google-btn">
+            <img src="https://www.svgrepo.com/show/355037/google.svg" alt="Google logo" />
+            Continue with Google
+          </a>
+
+          <p class="small-copy">Sign in with Google to access CritClass.</p>
+        </div>
+      </main>
+    </div>
+  </body>
+</html>

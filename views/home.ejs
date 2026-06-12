@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CritClass Home</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body>
+    <div class="page-shell dashboard-shell">
+      <header class="hero dashboard-hero">
+        <a href="/logout" class="secondary-btn signout-btn">Sign Out</a>
+        <form id="searchForm" class="header-search">
+          <input id="searchInput" class="search-input" type="search" placeholder="Search classes, teachers, or reviews" aria-label="Search" />
+          <button type="submit" class="primary-btn search-button">Search</button>
+        </form>
+        <div id="searchResults" class="search-results" aria-live="polite"></div>
+      </header>
+    </div>
+    <script src="/js/dashboard.js"></script>
+  </body>
+</html>

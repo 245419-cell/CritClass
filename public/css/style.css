@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Succulent&display=swap');
+
+:root {
+  --bg: #0d1321;
+  --panel: #111b34;
+  --panel-alt: #172040;
+  --text: #f7f8fa;
+  --muted: #a8b2d1;
+  --accent: #6e9cff;
+  --border: rgba(255, 255, 255, 0.08);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, sans-serif;
+  color: var(--text);
+  min-height: 100vh;
+  background-color: #2f4c1f;
+  background-image:
+    radial-gradient(circle at 20% 20%, rgba(255, 255, 255, 0.08), transparent 18%),
+    radial-gradient(circle at 80% 10%, rgba(255, 255, 255, 0.06), transparent 22%),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.06) 1px, transparent 1px),
+    linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+    radial-gradient(circle at top, #87b27b 0%, #2a472b 45%, #101928 100%);
+  background-size: 100% 100%, 100% 100%, 40px 40px, 100% 60px, auto;
+  background-blend-mode: screen, screen, normal, normal, normal;
+}
+
+.page-shell {
+  display: grid;
+  min-height: 100vh;
+  grid-template-rows: auto 1fr;
+}
+
+.hero {
+  padding: 4rem 1.5rem 2rem;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.hero::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 10% 20%, rgba(255, 255, 255, 0.06), transparent 25%),
+    radial-gradient(circle at 90% 15%, rgba(255, 255, 255, 0.05), transparent 22%),
+    linear-gradient(180deg, rgba(255, 255, 255, 0.05), transparent 40%);
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 1;
+  max-width: 700px;
+  margin: 0 auto;
+}
+
+.hero h1 {
+  margin: 0;
+  font-size: clamp(3.5rem, 5.5vw, 5.5rem);
+  letter-spacing: -0.04em;
+  font-family: 'Succulent', cursive;
+}
+
+.hero p {
+  margin: 1rem auto 0;
+  font-size: 1.3rem;
+  color: var(--muted);
+  max-width: 620px;
+  line-height: 1.7;
+}
+
+.auth-panel,
+.dashboard-panel {
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+}
+
+.auth-card,
+.dashboard-card {
+  width: min(450px, 100%);
+  background: rgba(15, 23, 46, 0.95);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 26px;
+  padding: 2rem;
+  box-shadow: 0 30px 80px rgba(0, 0, 0, 0.25);
+}
+
+.brand-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 1.5rem;
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  font-size: 0.95rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.form-switcher {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.switch {
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: transparent;
+  color: var(--text);
+  padding: 0.9rem 1rem;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.switch.active {
+  background: rgba(110, 156, 255, 0.16);
+  border-color: rgba(110, 156, 255, 0.35);
+}
+
+.auth-form {
+  display: none;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.auth-form.active {
+  display: grid;
+}
+
+.auth-form label {
+  font-size: 0.9rem;
+  color: var(--muted);
+}
+
+.auth-form input {
+  width: 100%;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--text);
+}
+
+.primary-btn,
+.secondary-btn,
+.google-btn {
+  width: 100%;
+  border: none;
+  border-radius: 18px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.75rem;
+  padding: 0.95rem 1rem;
+  font-size: 1rem;
+  cursor: pointer;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.primary-btn {
+  background: linear-gradient(135deg, #5c82ff, #8ec7ff);
+  color: #08101f;
+  font-weight: 700;
+}
+
+.primary-btn:hover,
+.secondary-btn:hover,
+.google-btn:hover {
+  transform: translateY(-1px);
+}
+
+.google-btn {
+  margin-top: 1rem;
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  text-decoration: none;
+}
+
+.google-btn img {
+  width: 22px;
+  height: 22px;
+}
+
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin: 1.5rem 0 1rem;
+  color: var(--muted);
+}
+
+.divider::before,
+.divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.alert {
+  margin-bottom: 1rem;
+  padding: 0.95rem 1rem;
+  border-radius: 16px;
+  background: rgba(255, 135, 135, 0.16);
+  color: #ffd7d7;
+  border: 1px solid rgba(255, 135, 135, 0.2);
+}
+
+.small-copy {
+  margin-top: 1rem;
+  color: var(--muted);
+  font-size: 0.9rem;
+  line-height: 1.6;
+}
+
+.dashboard-shell {
+  min-height: 100vh;
+}
+
+.dashboard-hero {
+  position: relative;
+  padding: 2rem 1rem 1.5rem;
+}
+
+.header-search {
+  display: flex;
+  align-items: stretch;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 3.75rem;
+  max-width: 560px;
+  width: min(100%, 560px);
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.search-input {
+  flex: 4 1 300px;
+  min-width: 240px;
+  padding: 0.95rem 1.1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+}
+
+.search-input::placeholder {
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.search-button {
+  flex: 0 0 auto;
+  width: 60px;
+  padding: 0.7rem 0.6rem;
+  font-size: 0.95rem;
+}
+
+.search-results {
+  margin-top: 1rem;
+  color: var(--text);
+  text-align: center;
+  font-size: 0.95rem;
+}
+
+.signout-btn {
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  padding: 0.85rem 1rem;
+  font-size: 0.95rem;
+}
+
+.dashboard-card {
+  text-align: left;
+}
+
+.dashboard-card h2 {
+  margin-top: 0;
+}
+
+.secondary-btn {
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--text);
+  max-width: 220px;
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding-top: 3rem;
+  }
+
+  .auth-card,
+  .dashboard-card {
+    padding: 1.5rem;
+  }
+}
