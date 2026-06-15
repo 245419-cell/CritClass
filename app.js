@@ -326,6 +326,30 @@ db.serialize(() => {
   });
 });
 
+// reviews table
+db.serialize(() => {
+  db.run(`
+    CREATE TABLE IF NOT EXISTS reviews (
+      id INTEGER PRIMARY KEY AUTOINCREMENT,
+      sectionId INTEGER,
+      name TEXT,
+      body TEXT,
+      authorId INTEGER,
+      createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
+      FOREIGN KEY(sectionId) REFERENCES sections(id)
+    )
+  `);
+
+  db.all('PRAGMA table_info(reviews)', (err, cols) => {
+    if (!err && cols) {
+      const hasAuthor = cols.some((col) => col.name === 'authorId');
+      if (!hasAuthor) {
+        db.run('ALTER TABLE reviews ADD COLUMN authorId INTEGER');
+      }
+    }
+  });
+});
+
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
 app.use(express.static(path.join(__dirname, 'public')));
@@ -475,14 +499,26 @@ app.get(
 );
 
 app.get('/home', requireAuth, (req, res) => {
-  res.render('home', {
-    user: req.user,
+  db.all('SELECT id, teacherFirstName, teacherLastName, courseName FROM sections ORDER BY courseName', (err, rows) => {
+    if (err) {
+      return res.render('home', { user: req.user, sections: [] });
+    }
+    res.render('home', {
+      user: req.user,
+      sections: rows || [],
+    });
   });
 });
 
 app.get('/dashboard', requireAuth, (req, res) => {
-  res.render('dashboard', {
-    user: req.user,
+  db.all('SELECT id, teacherFirstName, teacherLastName, courseName FROM sections ORDER BY courseName', (err, rows) => {
+    if (err) {
+      return res.render('dashboard', { user: req.user, sections: [] });
+    }
+    res.render('dashboard', {
+      user: req.user,
+      sections: rows || [],
+    });
   });
 });
 
@@ -490,6 +526,84 @@ app.get('/logout', (req, res) => {
   req.logout(() => {
     res.redirect('/');
   });
+});
+
+app.get('/class/:id', requireAuth, (req, res) => {
+  const id = req.params.id;
+  db.get('SELECT id, teacherFirstName, teacherLastName, courseName FROM sections WHERE id = ?', [id], (err, section) => {
+    if (err || !section) {
+      return res.status(404).render('class', { id, section: null, reviews: [], user: req.user });
+    }
+
+    db.all('SELECT id, name, body, authorId, createdAt FROM reviews WHERE sectionId = ? ORDER BY createdAt DESC', [id], (rvErr, reviews) => {
+      if (rvErr) reviews = [];
+      res.render('class', { id, section, reviews, user: req.user });
+    });
+  });
+});
+
+// Public review submission (anyone can post)
+app.post('/class/:id/review', requireAuth, (req, res) => {
+  const id = req.params.id;
+  const name = (req.body.name || req.user.displayName || 'Anonymous').trim();
+  const body = (req.body.body || '').trim();
+  const authorId = req.user ? req.user.id : null;
+
+  if (!body) {
+    return res.redirect(`/class/${id}?message=Review+cannot+be+empty`);
+  }
+
+  db.run('INSERT INTO reviews (sectionId, name, body, authorId) VALUES (?, ?, ?, ?)', [id, name, body, authorId], function (err) {
+    return res.redirect(`/class/${id}`);
+  });
+});
+
+app.post('/class/:id/review/delete', requireAuth, (req, res) => {
+  const id = req.params.id;
+  const reviewId = req.body.reviewId;
+
+  if (!reviewId) {
+    return res.redirect(`/class/${id}`);
+  }
+
+  db.get('SELECT authorId FROM reviews WHERE id = ? AND sectionId = ?', [reviewId, id], (err, review) => {
+    if (err || !review) {
+      return res.redirect(`/class/${id}`);
+    }
+
+    if (review.authorId !== req.user.id) {
+      return res.redirect(`/class/${id}`);
+    }
+
+    db.run('DELETE FROM reviews WHERE id = ?', [reviewId], () => {
+      return res.redirect(`/class/${id}`);
+    });
+  });
+});
+
+// Search API: return matching sections by courseName or teacher name
+app.get('/search', requireAuth, (req, res) => {
+  const q = (req.query.q || '').trim();
+  if (!q) return res.json({ found: false, sections: [] });
+
+  const pattern = `%${q}%`;
+  db.all(
+    `SELECT id, teacherFirstName, teacherLastName, courseName
+     FROM sections
+     WHERE LOWER(courseName) LIKE LOWER(?)
+        OR LOWER(teacherFirstName) LIKE LOWER(?)
+        OR LOWER(teacherLastName) LIKE LOWER(?)
+        OR LOWER(teacherFirstName || ' ' || teacherLastName) LIKE LOWER(?)
+        OR LOWER(teacherLastName || ' ' || teacherFirstName) LIKE LOWER(?)
+     ORDER BY courseName
+     LIMIT 50`,
+    [pattern, pattern, pattern, pattern, pattern],
+    (err, rows) => {
+      if (err) return res.json({ found: false, sections: [] });
+      if (!rows || rows.length === 0) return res.json({ found: false, sections: [] });
+      return res.json({ found: true, sections: rows });
+    }
+  );
 });
 
 app.listen(PORT, () => {

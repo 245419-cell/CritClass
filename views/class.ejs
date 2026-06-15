@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Class</title>
+    <link rel="stylesheet" href="/css/style.css" />
+  </head>
+  <body class="page-shell dashboard-shell">
+    <header class="hero dashboard-hero">
+      <a href="/home" class="secondary-btn back-btn">Back</a>
+      <div class="header-detail-wrapper">
+      </div>
+    </header>
+    <main class="class-content">
+        <div id="detailsBox" class="class-info-box details-box">
+          <h3>Details</h3>
+          <% if (section) { %>
+            <p><strong><%= section.courseName %></strong></p>
+            <p><%= section.teacherFirstName %> <%= section.teacherLastName %></p>
+          <% } else { %>
+            <p>Class information</p>
+          <% } %>
+        </div>
+      <div class="class-boxes-grid">
+        <div class="class-info-box reviews-box">
+          <h3>Reviews</h3>
+
+          <div class="reviews-list">
+            <% if (reviews && reviews.length) { %>
+              <% reviews.forEach(function(r) { %>
+                <div class="review-item">
+                  <div class="review-item-header">
+                    <strong><%= r.name %></strong>
+                    <% if (typeof user !== 'undefined' && user && r.authorId && user.id === r.authorId) { %>
+                      <form action="/class/<%= id %>/review/delete" method="post" class="delete-review-form">
+                        <input type="hidden" name="reviewId" value="<%= r.id %>" />
+                        <button type="submit" class="delete-review-btn">Remove</button>
+                      </form>
+                    <% } %>
+                  </div>
+                  <div class="review-body"><%= r.body %></div>
+                  <div class="review-meta"><%= new Date(r.createdAt).toLocaleString() %></div>
+                </div>
+              <% }); %>
+            <% } else { %>
+              <p>No reviews yet — be the first to write one.</p>
+            <% } %>
+          </div>
+
+          <form action="/class/<%= id %>/review" method="post" class="review-form">
+            <input type="text" name="name" placeholder="Your name (optional)" />
+            <textarea name="body" placeholder="Write your review..." required></textarea>
+            <button type="submit" class="primary-btn">Submit Review</button>
+          </form>
+
+        </div>
+      </div>
+    </main>
+    
+  </body>
+</html>
