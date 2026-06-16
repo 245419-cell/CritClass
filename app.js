@@ -342,6 +342,7 @@ db.serialize(() => {
       name TEXT,
       body TEXT,
       authorId INTEGER,
+      rating INTEGER,
       createdAt DATETIME DEFAULT CURRENT_TIMESTAMP,
       FOREIGN KEY(sectionId) REFERENCES sections(id)
     )
@@ -352,6 +353,10 @@ db.serialize(() => {
       const hasAuthor = cols.some((col) => col.name === 'authorId');
       if (!hasAuthor) {
         db.run('ALTER TABLE reviews ADD COLUMN authorId INTEGER');
+      }
+      const hasRating = cols.some((col) => col.name === 'rating');
+      if (!hasRating) {
+        db.run('ALTER TABLE reviews ADD COLUMN rating INTEGER');
       }
     }
   });
@@ -541,7 +546,7 @@ app.get('/class/:id', requireAuth, (req, res) => {
     if (err || !section) {
       return res.status(404).render('class', { id, section: null, reviews: [], user: req.user, message: req.query.message || null, isTeacher: false });
     }
-    db.all('SELECT id, name, body, authorId, createdAt FROM reviews WHERE sectionId = ? ORDER BY createdAt DESC', [id], (rvErr, reviews) => {
+    db.all('SELECT id, name, body, authorId, rating, createdAt FROM reviews WHERE sectionId = ? ORDER BY createdAt DESC', [id], (rvErr, reviews) => {
       if (rvErr) reviews = [];
       const email = req.user && req.user.email ? String(req.user.email) : '';
       // heuristic: teacher emails contain letters; student emails contain numbers
@@ -581,6 +586,11 @@ app.post('/class/:id/review', requireAuth, (req, res) => {
     return res.redirect(`/class/${id}?message=Review+cannot+be+empty`);
   }
 
+  const rating = parseInt(req.body.rating, 10);
+  if (!rating || rating < 1 || rating > 5) {
+    return res.redirect(`/class/${id}?message=Please+rate+the+class+from+1+to+5+stars`);
+  }
+
   db.get('SELECT COUNT(*) AS count FROM reviews WHERE sectionId = ? AND authorId = ?', [id, authorId], (countErr, row) => {
     if (countErr) {
       return res.redirect(`/class/${id}?message=Unable+to+check+review+limit`);
@@ -591,7 +601,7 @@ app.post('/class/:id/review', requireAuth, (req, res) => {
       return res.redirect(`/class/${id}?message=You+can+only+leave+two+reviews+per+class`);
     }
 
-    db.run('INSERT INTO reviews (sectionId, name, body, authorId) VALUES (?, ?, ?, ?)', [id, name, body, authorId], function (err) {
+    db.run('INSERT INTO reviews (sectionId, name, body, authorId, rating) VALUES (?, ?, ?, ?, ?)', [id, name, body, authorId, rating], function (err) {
       return res.redirect(`/class/${id}`);
     });
   });

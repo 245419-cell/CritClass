@@ -425,6 +425,46 @@ body {
   }
 }
 
+.review-rating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  margin-bottom: 0.75rem;
+}
+
+.star-inputs {
+  display: flex;
+  gap: 0.4rem;
+  margin-top: 0.4rem;
+}
+
+.star-inputs input {
+  display: none;
+}
+
+.star-inputs label {
+  cursor: pointer;
+  font-size: 1.4rem;
+  color: rgba(255,255,255,0.35);
+  transition: color 0.2s ease;
+}
+
+.star-inputs label:hover ~ label .star,
+.star-inputs label:hover .star,
+.star-inputs input:checked + .star,
+.star-inputs input:checked ~ label .star {
+  color: #ffd700;
+}
+.star-inputs input:checked + .star ~ label .star {
+  color: rgba(255,255,255,0.35);
+}
+
+.review-rating-display {
+  color: #ffd700;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
 .class-info-box {
   background: rgba(15, 23, 46, 0.6);
   border: 1px solid rgba(255, 255, 255, 0.12);

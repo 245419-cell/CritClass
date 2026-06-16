@@ -53,6 +53,7 @@
                       </form>
                     <% } %>
                   </div>
+                  <div class="review-rating-display"><%= Array(r.rating || 0).fill('★').join('') %><%= Array(5 - (r.rating || 0)).fill('☆').join('') %></div>
                   <div class="review-body"><%= r.body %></div>
                   <div class="review-meta"><%= new Date(r.createdAt).toLocaleString() %></div>
                 </div>
@@ -63,6 +64,17 @@
           </div>
 
           <form action="/class/<%= id %>/review" method="post" class="review-form">
+            <div class="review-rating">
+              <label>Rating:</label>
+              <div class="star-inputs" id="starRating">
+                <% for (let i = 1; i <= 5; i++) { %>
+                  <label class="star-label" data-value="<%= i %>">
+                    <input type="radio" name="rating" value="<%= i %>" />
+                    <span class="star">★</span>
+                  </label>
+                <% } %>
+              </div>
+            </div>
             <input type="text" name="name" placeholder="Your name (optional)" />
             <textarea name="body" placeholder="Write your review..." required></textarea>
             <button type="submit" class="primary-btn">Submit Review</button>
@@ -70,7 +82,33 @@
 
         </div>
       </div>
+          </div>
+        </div>
+      </div>
     </main>
-    
+    <script>
+      document.addEventListener('DOMContentLoaded', function () {
+        const starContainer = document.getElementById('starRating');
+        const stars = Array.from(starContainer.querySelectorAll('.star-label'));
+
+        function updateStars(value) {
+          stars.forEach((label) => {
+            const star = label.querySelector('.star');
+            star.style.color = Number(label.dataset.value) <= value ? '#ffd700' : 'rgba(255,255,255,0.35)';
+          });
+        }
+
+        stars.forEach((label) => {
+          const input = label.querySelector('input');
+          label.addEventListener('click', () => {
+            input.checked = true;
+            updateStars(Number(label.dataset.value));
+          });
+        });
+
+        // initialize empty stars on load
+        updateStars(0);
+      });
+    </script>
   </body>
 </html>
