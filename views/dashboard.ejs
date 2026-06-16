@@ -14,7 +14,7 @@
           <input id="searchInput" class="search-input" type="search" placeholder="Search classes, teachers, or reviews" aria-label="Search" />
           <button type="submit" class="primary-btn search-button">Search</button>
         </form>
-        <button id="showAllBtn" class="secondary-btn" style="margin-top: 1rem;">Show all</button>
+        <button id="showAllBtn" class="secondary-btn" style="margin-top: 1rem; display: none;">Show all</button>
         <div id="searchResults" class="search-results" aria-live="polite"></div>
         <% if (sections && sections.length) { %>
         <div class="quick-access-grid">
@@ -23,6 +23,11 @@
               <div class="quick-access-box">
                 <h3><%= s.courseName %></h3>
                 <p><%= s.teacherFirstName %> <%= s.teacherLastName %></p>
+                <% if (s.avgRating) { %>
+                  <p class="avg-rating">Average rating: <%= s.avgRating %> ★</p>
+                <% } else { %>
+                  <p class="avg-rating">No reviews yet</p>
+                <% } %>
               </div>
             </a>
           <% }); %>

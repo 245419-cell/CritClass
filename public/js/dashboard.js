@@ -5,8 +5,11 @@ const showAllBtn = document.getElementById('showAllBtn');
 
 // Handle 'Show all' button click
 if (showAllBtn) {
+  showAllBtn.style.display = 'none';
   showAllBtn.addEventListener('click', () => {
     searchInput.value = '';
+    showAllBtn.style.display = 'none';
+    searchResults.textContent = '';
     location.reload();
   });
 }
@@ -38,12 +41,12 @@ if (searchForm && searchInput && searchResults) {
           grid.style.display = '';
           grid.innerHTML = data.sections
             .map((s) => {
-              return (`<a href="/class/${s.id}" class="quick-access-link"><div class="quick-access-box"><h3>${escapeHtml(s.courseName)}</h3><p>${escapeHtml(s.teacherFirstName)} ${escapeHtml(s.teacherLastName)}</p></div></a>`);
+              return `<a href="/class/${s.id}" class="quick-access-link"><div class="quick-access-box"><h3>${escapeHtml(s.courseName)}</h3><p>${escapeHtml(s.teacherFirstName)} ${escapeHtml(s.teacherLastName)}</p><p class="avg-rating">${s.avgRating ? `Average rating: ${escapeHtml(s.avgRating)} ★` : 'No reviews yet'}</p></div></a>`;
             })
             .join('');
+          searchResults.textContent = '';
+          showAllBtn.style.display = 'block';
         }
-
-        searchResults.textContent = '';
       })
       .catch(() => {
         searchResults.textContent = `Search failed. Try again.`;

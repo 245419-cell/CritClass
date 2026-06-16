@@ -23,6 +23,11 @@
               <div class="quick-access-box">
                 <h3><%= s.courseName %></h3>
                 <p><%= s.teacherFirstName %> <%= s.teacherLastName %></p>
+                <% if (s.avgRating) { %>
+                  <p class="avg-rating">Average rating: <%= s.avgRating %> ★</p>
+                <% } else { %>
+                  <p class="avg-rating">No reviews yet</p>
+                <% } %>
               </div>
             </a>
           <% }); %>

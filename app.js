@@ -510,8 +510,18 @@ app.get(
   }
 );
 
+const sectionListQuery = `
+  SELECT s.id, s.teacherFirstName, s.teacherLastName, s.courseName,
+    ROUND(AVG(r.rating), 1) AS avgRating,
+    COUNT(r.rating) AS reviewCount
+  FROM sections s
+  LEFT JOIN reviews r ON r.sectionId = s.id
+  GROUP BY s.id
+  ORDER BY s.courseName
+`;
+
 app.get('/home', requireAuth, (req, res) => {
-  db.all('SELECT id, teacherFirstName, teacherLastName, courseName FROM sections ORDER BY courseName', (err, rows) => {
+  db.all(sectionListQuery, (err, rows) => {
     if (err) {
       return res.render('home', { user: req.user, sections: [] });
     }
@@ -523,7 +533,7 @@ app.get('/home', requireAuth, (req, res) => {
 });
 
 app.get('/dashboard', requireAuth, (req, res) => {
-  db.all('SELECT id, teacherFirstName, teacherLastName, courseName FROM sections ORDER BY courseName', (err, rows) => {
+  db.all(sectionListQuery, (err, rows) => {
     if (err) {
       return res.render('dashboard', { user: req.user, sections: [] });
     }
@@ -637,14 +647,18 @@ app.get('/search', requireAuth, (req, res) => {
 
   const pattern = `%${q}%`;
   db.all(
-    `SELECT id, teacherFirstName, teacherLastName, courseName
-     FROM sections
-     WHERE LOWER(courseName) LIKE LOWER(?)
-        OR LOWER(teacherFirstName) LIKE LOWER(?)
-        OR LOWER(teacherLastName) LIKE LOWER(?)
-        OR LOWER(teacherFirstName || ' ' || teacherLastName) LIKE LOWER(?)
-        OR LOWER(teacherLastName || ' ' || teacherFirstName) LIKE LOWER(?)
-     ORDER BY courseName
+    `SELECT s.id, s.teacherFirstName, s.teacherLastName, s.courseName,
+      ROUND(AVG(r.rating), 1) AS avgRating,
+      COUNT(r.rating) AS reviewCount
+     FROM sections s
+     LEFT JOIN reviews r ON r.sectionId = s.id
+     WHERE LOWER(s.courseName) LIKE LOWER(?)
+        OR LOWER(s.teacherFirstName) LIKE LOWER(?)
+        OR LOWER(s.teacherLastName) LIKE LOWER(?)
+        OR LOWER(s.teacherFirstName || ' ' || s.teacherLastName) LIKE LOWER(?)
+        OR LOWER(s.teacherLastName || ' ' || s.teacherFirstName) LIKE LOWER(?)
+     GROUP BY s.id
+     ORDER BY s.courseName
      LIMIT 50`,
     [pattern, pattern, pattern, pattern, pattern],
     (err, rows) => {
