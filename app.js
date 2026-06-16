@@ -581,8 +581,19 @@ app.post('/class/:id/review', requireAuth, (req, res) => {
     return res.redirect(`/class/${id}?message=Review+cannot+be+empty`);
   }
 
-  db.run('INSERT INTO reviews (sectionId, name, body, authorId) VALUES (?, ?, ?, ?)', [id, name, body, authorId], function (err) {
-    return res.redirect(`/class/${id}`);
+  db.get('SELECT COUNT(*) AS count FROM reviews WHERE sectionId = ? AND authorId = ?', [id, authorId], (countErr, row) => {
+    if (countErr) {
+      return res.redirect(`/class/${id}?message=Unable+to+check+review+limit`);
+    }
+
+    const reviewCount = row ? row.count : 0;
+    if (reviewCount >= 2) {
+      return res.redirect(`/class/${id}?message=You+can+only+leave+two+reviews+per+class`);
+    }
+
+    db.run('INSERT INTO reviews (sectionId, name, body, authorId) VALUES (?, ?, ?, ?)', [id, name, body, authorId], function (err) {
+      return res.redirect(`/class/${id}`);
+    });
   });
 });
 
