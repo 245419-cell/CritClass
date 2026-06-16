@@ -375,10 +375,54 @@ body {
 
 .class-boxes-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 1.5rem;
-  max-width: 560px;
-  width: min(100%, 560px);
+  grid-template-columns: 1fr;
+  gap: 1rem; /* reduced gap to tighten vertical spacing */
+  max-width: 1000px;
+  width: min(100%, 1000px);
+  align-items: start;
+  justify-items: start; /* align children to the left edge */
+  margin: 0 auto; /* center the grid container */
+}
+
+/* both boxes share the same width so their left edges align */
+.details-box,
+.reviews-box {
+  align-self: start;
+  width: 100%;
+  max-width: 760px;
+}
+
+.details-box {
+  min-height: 200px; /* reduced height to remove extra empty space */
+}
+
+.reviews-box {
+  min-height: 200px; /* match details height to keep them compact */
+}
+
+@media (min-width: 1120px) {
+  .class-boxes-grid {
+    grid-template-columns: 2fr 1fr;
+    max-width: 1000px;
+  }
+
+  /* keep both panels same outer width on wide screens so they align */
+  .details-box,
+  .reviews-box {
+    max-width: 660px;
+  }
+}
+
+@media (max-width: 900px) {
+  .class-boxes-grid {
+    grid-template-columns: 1fr;
+    max-width: 660px;
+  }
+
+  .details-box,
+  .reviews-box {
+    max-width: 100%;
+  }
 }
 
 .class-info-box {
@@ -413,30 +457,23 @@ body {
   overflow: visible;
 }
 
-.details-box {
-  position: fixed;
-  top: calc(0.9rem + 200px);
-  left: calc(5.5rem + 40px);
-  z-index: 102;
+.details-box,
+.reviews-box {
+  position: relative;
+  z-index: 1;
   transform: none;
   padding: 1.25rem 1.25rem;
   border-radius: 14px;
-  min-width: 340px;
-  min-height: 120px;
   box-shadow: 0 8px 20px rgba(0,0,0,0.25);
 }
 
-/* Reviews box: aligned with details but placed lower */
+.details-box {
+  min-height: 280px;
+}
+
 .reviews-box {
-  position: fixed;
-  top: calc(0.9rem + 360px);
-  left: calc(5.5rem + 40px);
-  z-index: 101;
-  transform: none;
   padding: 1.1rem 1.1rem;
-  border-radius: 14px;
-  min-width: 320px;
-  min-height: 100px;
+  min-height: 180px;
   box-shadow: 0 6px 18px rgba(0,0,0,0.18);
 }
 
@@ -489,7 +526,8 @@ body {
 }
 
 .review-form input[type="text"],
-.review-form textarea {
+.review-form textarea,
+.class-details-form textarea {
   width: 100%;
   border-radius: 10px;
   border: 1px solid rgba(255,255,255,0.08);
@@ -499,9 +537,30 @@ body {
   margin-bottom: 0.5rem;
 }
 
-.review-form textarea {
+.review-form textarea,
+.class-details-form textarea {
   min-height: 80px;
   resize: vertical;
+}
+
+.class-details-form {
+  display: grid;
+  gap: 0.75rem;
+  text-align: left;
+}
+
+.class-details-form button {
+  justify-self: start;
+  padding: 0.65rem 1rem;
+  border-radius: 999px;
+  border: 1px solid rgba(255,255,255,0.12);
+  background: rgba(255,255,255,0.06);
+  color: var(--text);
+  cursor: pointer;
+}
+
+.class-details-form button:hover {
+  background: rgba(255,255,255,0.12);
 }
 
 @media (max-width: 600px) {

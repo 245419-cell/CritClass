@@ -13,16 +13,30 @@
       </div>
     </header>
     <main class="class-content">
+      <div class="class-boxes-grid">
         <div id="detailsBox" class="class-info-box details-box">
           <h3>Details</h3>
+          <% if (message) { %>
+            <div class="alert"><%= message %></div>
+          <% } %>
           <% if (section) { %>
-            <p><strong><%= section.courseName %></strong></p>
-            <p><%= section.teacherFirstName %> <%= section.teacherLastName %></p>
+            <% if (isTeacher) { %>
+            <form action="/class/<%= id %>/details" method="post" class="class-details-form">
+              <p><strong><%= section.courseName %></strong></p>
+              <p><%= section.teacherFirstName %> <%= section.teacherLastName %></p>
+              <textarea name="details" placeholder="Add notes or class details..." rows="4"><%= section.details || '' %></textarea>
+              <button type="submit" class="secondary-btn">Save Details</button>
+            </form>
+            <% } else { %>
+              <p><strong><%= section.courseName %></strong></p>
+              <p><%= section.teacherFirstName %> <%= section.teacherLastName %></p>
+              <div class="details-readonly"><%= section.details || 'No details yet.' %></div>
+            <% } %>
           <% } else { %>
             <p>Class information</p>
           <% } %>
         </div>
-      <div class="class-boxes-grid">
+
         <div class="class-info-box reviews-box">
           <h3>Reviews</h3>
 

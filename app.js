@@ -32,9 +32,16 @@ db.serialize(() => {
       id INTEGER PRIMARY KEY AUTOINCREMENT,
       teacherFirstName TEXT,
       teacherLastName TEXT,
-      courseName TEXT
+      courseName TEXT,
+      details TEXT
     )
   `);
+
+  db.all('PRAGMA table_info(sections)', (err, cols) => {
+    if (!err && cols && !cols.some(c => c.name === 'details')) {
+      db.run('ALTER TABLE sections ADD COLUMN details TEXT');
+    }
+  });
 
   const sections = [
     ["Laurie","Medeiros","Early Graduation"],
@@ -530,15 +537,36 @@ app.get('/logout', (req, res) => {
 
 app.get('/class/:id', requireAuth, (req, res) => {
   const id = req.params.id;
-  db.get('SELECT id, teacherFirstName, teacherLastName, courseName FROM sections WHERE id = ?', [id], (err, section) => {
+  db.get('SELECT id, teacherFirstName, teacherLastName, courseName, details FROM sections WHERE id = ?', [id], (err, section) => {
     if (err || !section) {
-      return res.status(404).render('class', { id, section: null, reviews: [], user: req.user });
+      return res.status(404).render('class', { id, section: null, reviews: [], user: req.user, message: req.query.message || null, isTeacher: false });
     }
-
     db.all('SELECT id, name, body, authorId, createdAt FROM reviews WHERE sectionId = ? ORDER BY createdAt DESC', [id], (rvErr, reviews) => {
       if (rvErr) reviews = [];
-      res.render('class', { id, section, reviews, user: req.user });
+      const email = req.user && req.user.email ? String(req.user.email) : '';
+      // heuristic: teacher emails contain letters; student emails contain numbers
+      const isTeacher = email && !/\d/.test(email);
+      res.render('class', { id, section, reviews, user: req.user, message: req.query.message || null, isTeacher });
     });
+  });
+});
+
+app.post('/class/:id/details', requireAuth, (req, res) => {
+  const id = req.params.id;
+  const details = (req.body.details || '').trim();
+  const email = req.user && req.user.email ? String(req.user.email) : '';
+  const isTeacher = email && !/\d/.test(email);
+
+  if (!isTeacher) {
+    return res.redirect(`/class/${id}?message=Only+teachers+can+edit+details`);
+  }
+
+  db.run('UPDATE sections SET details = ? WHERE id = ?', [details, id], function (err) {
+    if (err) {
+      return res.redirect(`/class/${id}?message=Unable+to+save+details`);
+    }
+
+    return res.redirect(`/class/${id}?message=Details+updated`);
   });
 });
 
